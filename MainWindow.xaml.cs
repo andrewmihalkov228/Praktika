@@ -40,6 +40,12 @@ namespace АвторизацияПрактикаКозулин
             LoginTextBox.IsEnabled = true;
             PasswordBox.IsEnabled = true;
             PasswordTextBox.IsEnabled = true;
+            EnterButton.IsEnabled = true;
+
+            LoginTextBox.Text = (string)LoginTextBox.Tag;
+            PasswordBox.Password = (string)PasswordBox.Tag;
+            PasswordTextBox.Text = (string)PasswordTextBox.Tag;
+
             timer.Stop();
         }
         private void SetPlaceholders()
@@ -59,9 +65,14 @@ namespace АвторизацияПрактикаКозулин
             var loginOrEmail = LoginTextBox.Text;
             var password = PasswordBox.Password;
 
+            if (PasswordTextBox.Visibility == Visibility.Visible)
+            {
+                password = PasswordTextBox.Text;
+            }
+
             using (var context = new AppDbContext())
             {
-                var user = context.Users.FirstOrDefault(x => (x.Login == loginOrEmail) && x.Password == password);
+                var user = context.Users.FirstOrDefault(x => (x.Login == loginOrEmail || x.Email == loginOrEmail) && x.Password == password);
 
                 if (user != null)
                 {
@@ -78,6 +89,7 @@ namespace АвторизацияПрактикаКозулин
                         LoginTextBox.IsEnabled = false;
                         PasswordBox.IsEnabled = false;
                         PasswordTextBox.IsEnabled = false;
+                        EnterButton.IsEnabled = false;
                         MessageBox.Show("Превышено количество попыток входа. Повторите попытку через 15 секунд.");
                         timer.Start();
                     }
@@ -88,7 +100,7 @@ namespace АвторизацияПрактикаКозулин
                 }
             }
         }
-            private void TogglePasswordVisibility(PasswordBox passwordBox, TextBox passwordTextBox, Image eyeIcon)
+        private void TogglePasswordVisibility(PasswordBox passwordBox, TextBox passwordTextBox, Image eyeIcon)
         {
             isTogglingPasswordVisibility = true;
 

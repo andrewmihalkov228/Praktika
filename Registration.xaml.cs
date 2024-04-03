@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -46,12 +47,19 @@ namespace АвторизацияПрактикаКозулин
         private void RegBtn_Click(object sender, RoutedEventArgs e)
         {
             var login = LoginTextBox.Text;
-
             var email = EmailTextBox.Text;
-
             var pass = PasswordBox.Password;
-
             var confirmPassword = ConfirmPasswordBox.Password;
+
+            if (PasswordTextBox.Visibility == Visibility.Visible)
+            {
+                pass = PasswordTextBox.Text;
+            }
+
+            if (ConfirmPasswordTextBox.Visibility == Visibility.Visible)
+            {
+                confirmPassword = ConfirmPasswordTextBox.Text;
+            }
 
             bool isValid = true;
 
@@ -104,6 +112,8 @@ namespace АвторизацияПрактикаКозулин
                 return;
             }
 
+            isValid = true;
+
             var context = new AppDbContext();
 
             var user_exists = context.Users.FirstOrDefault(x => x.Login == login);
@@ -133,7 +143,8 @@ namespace АвторизацияПрактикаКозулин
         private bool IsValidEmail(string email)
         {
             // Проверка правильности вписания почты
-            return email.Contains("@") && email.LastIndexOf(".") > email.IndexOf("@");
+            string pattern = @"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$";
+            return Regex.IsMatch(email, pattern);
         }
 
         private bool HasSpecialCharacters(string password)

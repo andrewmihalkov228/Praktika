@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -43,6 +44,13 @@ namespace АвторизацияПрактикаКозулин
         private async void ChangeEmailButton_Click(object sender, RoutedEventArgs e)
         {
             string newEmail = EmailTextBox.Text;
+
+            if (!IsValidEmail(newEmail))
+            {
+                MessageBox.Show("Неверный формат email. Пожалуйста, введите корректный email.");
+                return;
+            }
+
             User user = _context.Users.FirstOrDefault(x => x.Login == _userLogin);
             if (user != null)
             {
@@ -55,6 +63,20 @@ namespace АвторизацияПрактикаКозулин
         private async void ChangePasswordButton_Click(object sender, RoutedEventArgs e)
         {
             string newPassword = PasswordBox.Password;
+
+            if (newPassword.Length < 6)
+            {
+                MessageBox.Show("Пароль должен содержать не менее 6 символов.");
+                return;
+            }
+
+            string specialCharacters = "!@#$%^&*()_+";
+            if (!newPassword.Any(c => specialCharacters.Contains(c)))
+            {
+                MessageBox.Show("Пароль должен содержать хотя бы один специальный символ.");
+                return;
+            }
+
             User user = _context.Users.FirstOrDefault(x => x.Login == _userLogin);
             if (user != null)
             {
@@ -62,6 +84,12 @@ namespace АвторизацияПрактикаКозулин
                 await _context.SaveChangesAsync();
                 MessageBox.Show("Пароль успешно изменен!");
             }
+        }
+
+        private bool IsValidEmail(string email)
+        {
+            string pattern = @"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$";
+            return Regex.IsMatch(email, pattern);
         }
 
         private void BackButton_Click(object sender, RoutedEventArgs e)

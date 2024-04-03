@@ -45,7 +45,7 @@
                        MouseLeftButtonUp="RegisterTextBlock_MouseLeftButtonUp"/>
         </StackPanel>
 
-        <Button Click="Enter_Click" Grid.Row="3" Width="200" Height="50" HorizontalAlignment="Center" Margin="0,0,0,40">
+        <Button x:Name="EnterButton" Click="Enter_Click" Grid.Row="3" Width="200" Height="50" HorizontalAlignment="Center" Margin="0,0,0,40">
             <Button.Style>
                 <Style TargetType="Button">
                     <Setter Property="Background" Value="Green"/>
