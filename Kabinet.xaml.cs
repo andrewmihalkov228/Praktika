@@ -98,5 +98,15 @@ namespace АвторизацияПрактикаКозулин
             window1.Show();
             this.Close();
         }
+
+        private void TextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void TextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

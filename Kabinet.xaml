@@ -18,7 +18,7 @@
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20">
             <TextBlock Text="Email:" VerticalAlignment="Center" Margin="0,0,10,0"/>
-            <TextBox x:Name="EmailTextBox" Width="200" VerticalAlignment="Center"/>
+            <TextBox x:Name="EmailTextBox" Width="200" VerticalAlignment="Center" Tag="Введите почту" GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus"/>
             <Button Content="Изменить" Padding="10,5" Click="ChangeEmailButton_Click">
                 <Button.Style>
                     <Style TargetType="{x:Type Button}">

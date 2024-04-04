@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -29,36 +30,8 @@ namespace АвторизацияПрактикаКозулин
         {
             InitializeComponent();
             SetPlaceholders();
-            if (Config.IsLocked)
-            {
-                LoginTextBox.IsEnabled = false;
-                PasswordBox.IsEnabled = false;
-                PasswordTextBox.IsEnabled = false;
-                EnterButton.IsEnabled = false;
-            }
-
-            if (Config.timer == null)
-            {
-                Config.timer = new DispatcherTimer();
-                Config.timer.Interval = TimeSpan.FromSeconds(15);
-                Config.timer.Tick += Timer_Tick;
-            }
         }
-        private void Timer_Tick(object sender, EventArgs e)
-        {
-            Config.failedAttempts = 0;
-            LoginTextBox.IsEnabled = true;
-            PasswordBox.IsEnabled = true;
-            PasswordTextBox.IsEnabled = true;
-            EnterButton.IsEnabled = true;
-            Config.IsLocked = false;
-
-            LoginTextBox.Text = (string)LoginTextBox.Tag;
-            PasswordBox.Password = (string)PasswordBox.Tag;
-            PasswordTextBox.Text = (string)PasswordTextBox.Tag;
-
-            Config.timer.Stop();
-        }
+        
         private void SetPlaceholders()
         {
             LoginTextBox.Text = (string)LoginTextBox.Tag;
@@ -97,13 +70,8 @@ namespace АвторизацияПрактикаКозулин
                     Config.failedAttempts++;
                     if (Config.failedAttempts >= 3)
                     {
-                        LoginTextBox.IsEnabled = false;
-                        PasswordBox.IsEnabled = false;
-                        PasswordTextBox.IsEnabled = false;
-                        EnterButton.IsEnabled = false;
-                        Config.IsLocked = true;
+                        BlockInputs();
                         MessageBox.Show("Превышено количество попыток входа. Повторите попытку через 15 секунд.");
-                        Config.timer.Start();
                     }
                     else
                     {
@@ -112,6 +80,27 @@ namespace АвторизацияПрактикаКозулин
                 }
             }
         }
+        private void BlockInputs()
+        {
+            new Thread(() => {
+                var start = DateTime.Now; var end = start.AddSeconds(15);
+                while (true)
+                {
+                    var currentTime = DateTime.Now; if (currentTime >= end)
+                        break;
+                    Dispatcher.Invoke(() => {
+                        LoginTextBox.IsEnabled = false; PasswordTextBox.IsEnabled = false;
+                        PasswordBox.IsEnabled = false; EnterButton.IsEnabled = false;
+                    });
+                    Thread.Sleep(400);
+                }
+                Dispatcher.Invoke(() => {
+                    LoginTextBox.IsEnabled = true; PasswordTextBox.IsEnabled = true;
+                    PasswordBox.IsEnabled = true; EnterButton.IsEnabled = true;
+                }); Config.failedAttempts = 0;
+            }).Start();
+        }
+
         private void TogglePasswordVisibility(PasswordBox passwordBox, TextBox passwordTextBox, Image eyeIcon)
         {
             isTogglingPasswordVisibility = true;
