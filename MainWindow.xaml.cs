@@ -24,29 +24,40 @@ namespace АвторизацияПрактикаКозулин
     public partial class Authorization : Window
     {
         private bool isTogglingPasswordVisibility;
-        private int failedAttempts = 0;
-        private DispatcherTimer timer;
+
         public Authorization()
         {
             InitializeComponent();
             SetPlaceholders();
-            timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromSeconds(15);
-            timer.Tick += Timer_Tick;
+            if (Config.IsLocked)
+            {
+                LoginTextBox.IsEnabled = false;
+                PasswordBox.IsEnabled = false;
+                PasswordTextBox.IsEnabled = false;
+                EnterButton.IsEnabled = false;
+            }
+
+            if (Config.timer == null)
+            {
+                Config.timer = new DispatcherTimer();
+                Config.timer.Interval = TimeSpan.FromSeconds(15);
+                Config.timer.Tick += Timer_Tick;
+            }
         }
         private void Timer_Tick(object sender, EventArgs e)
         {
-            failedAttempts = 0;
+            Config.failedAttempts = 0;
             LoginTextBox.IsEnabled = true;
             PasswordBox.IsEnabled = true;
             PasswordTextBox.IsEnabled = true;
             EnterButton.IsEnabled = true;
+            Config.IsLocked = false;
 
             LoginTextBox.Text = (string)LoginTextBox.Tag;
             PasswordBox.Password = (string)PasswordBox.Tag;
             PasswordTextBox.Text = (string)PasswordTextBox.Tag;
 
-            timer.Stop();
+            Config.timer.Stop();
         }
         private void SetPlaceholders()
         {
@@ -76,22 +87,23 @@ namespace АвторизацияПрактикаКозулин
 
                 if (user != null)
                 {
-                    failedAttempts = 0;
+                    Config.failedAttempts = 0;
                     Window1 window1 = new Window1(user.Login);
                     window1.Show();
                     this.Close();
                 }
                 else
                 {
-                    failedAttempts++;
-                    if (failedAttempts >= 3)
+                    Config.failedAttempts++;
+                    if (Config.failedAttempts >= 3)
                     {
                         LoginTextBox.IsEnabled = false;
                         PasswordBox.IsEnabled = false;
                         PasswordTextBox.IsEnabled = false;
                         EnterButton.IsEnabled = false;
+                        Config.IsLocked = true;
                         MessageBox.Show("Превышено количество попыток входа. Повторите попытку через 15 секунд.");
-                        timer.Start();
+                        Config.timer.Start();
                     }
                     else
                     {
